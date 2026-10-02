@@ -1,0 +1,31 @@
+name: 10KoraStats Daily Auto-Pilot
+
+on:
+  schedule:
+    # يعمل تلقائياً كل يوم الساعة 05:00 صباحاً بتوقيت غرينتش
+    - cron: '0 5 * * *'
+  workflow_dispatch: # يتيح لك تشغيله يدوياً في أي وقت بضغطة زر
+
+jobs:
+  update-matches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Generate Today's Predictions
+        run: |
+          python generate_matches.py
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "10Kora-Bot"
+          git config --global user.email "bot@10korastats.com"
+          git add today_matches.json
+          git commit -m "Auto-update matches: $(date +'%Y-%m-%d')" || exit 0
+          git push
