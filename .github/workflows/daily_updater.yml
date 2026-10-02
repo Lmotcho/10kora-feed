@@ -2,19 +2,22 @@ name: 10KoraStats Daily Auto-Pilot
 
 on:
   schedule:
-    # يعمل تلقائياً كل يوم الساعة 05:00 صباحاً بتوقيت غرينتش
     - cron: '0 5 * * *'
-  workflow_dispatch: # يتيح لك تشغيله يدوياً في أي وقت بضغطة زر
+  workflow_dispatch:
+
+# إعطاء صلاحية الكتابة رسمياً للروبوت لحل الخطأ 128
+permissions:
+  contents: write
 
 jobs:
   update-matches:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -24,8 +27,8 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config --global user.name "10Kora-Bot"
-          git config --global user.email "bot@10korastats.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add today_matches.json
-          git commit -m "Auto-update matches: $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "Auto-update matches: $(date +'%Y-%m-%d')" || echo "No changes to commit"
           git push
